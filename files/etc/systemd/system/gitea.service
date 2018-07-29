@@ -25,7 +25,7 @@ Group=${gitea.get('group', 'gitea')}
 WorkingDirectory=/var/lib/gitea/
 ExecStart=/usr/local/bin/gitea web -c /etc/gitea/app.ini
 Restart=always
-Environment=USER=${gitea.get('user', 'gitea')} HOME=/home/${gitea.get('user', 'gitea')} GITEA_WORK_DIR=/var/lib/gitea
+Environment=USER=${gitea.get('user', 'gitea')} HOME=/var/lib/gitea GITEA_WORK_DIR=/var/lib/gitea
 # If you want to bind Gitea to a port below 1024 uncomment
 # the two values below
 ###
