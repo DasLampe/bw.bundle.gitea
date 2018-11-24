@@ -2,7 +2,7 @@ mysql_db = node.metadata.get('gitea', {}).get('db', {}).get('db', 'gitea')
 mysql_host = node.metadata.get('gitea', {}).get('db', {}).get('host', 'localhost')
 mysql_user = node.metadata.get('db', {}).get('user', 'gitea')
 mysql_password = node.metadata.get('gitea', {}).get('db', {}).\
-    get('password', repo.libs.pw.get("mysql_{}_user_{}".format(mysql_user, node.name)))
+    get('password', repo.vault.password_for("mysql_{}_user_{}".format(mysql_user, node.name)))
 
 user = node.metadata.get('gitea', {}).get('user', 'gitea')
 group = node.metadata.get('gitea', {}).get('group', 'gitea')
