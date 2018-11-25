@@ -137,6 +137,7 @@ files = {
         'owner': user,
         'group': group,
         'mode': '0644',
+        'unless': 'test -f /etc/gitea/app.ini', # Gitea write INTERNAL_TOKEN to ini file
         'needs': [
             'action:create_gitea_user',
         ]
