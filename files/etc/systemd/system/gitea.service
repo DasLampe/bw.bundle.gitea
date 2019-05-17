@@ -8,8 +8,10 @@ After=mysqld.service
 % if gitea.get('db', {}).get('type', 'mysql') == 'postgresql':
 After=postgresql.service
 %endif
-#After=memcached.service
-#After=redis.service
+#Requires=mariadb.service
+#Requires=postgresql.service
+#Requires=memcached.service
+#Requires=redis.service
 
 [Service]
 # Modify these two values and uncomment them if you have
@@ -25,7 +27,7 @@ Group=${gitea.get('group', 'gitea')}
 WorkingDirectory=/var/lib/gitea/
 ExecStart=/usr/local/bin/gitea web -c /etc/gitea/app.ini
 Restart=always
-Environment=USER=${gitea.get('user', 'gitea')} HOME=/var/lib/gitea GITEA_WORK_DIR=/var/lib/gitea
+Environment=USER=${gitea.get('user', 'gitea')}  HOME=/var/lib/gitea GITEA_WORK_DIR=/var/lib/gitea
 # If you want to bind Gitea to a port below 1024 uncomment
 # the two values below
 ###
