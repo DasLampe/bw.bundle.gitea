@@ -56,6 +56,7 @@ actions = {
     },
     'chown_gitea': {
         'command': 'chown {}:{} /usr/local/bin/gitea'.format(user, group),
+        'unless': 'test "`stat -c %U:%G /usr/local/bin/gitea`" = "{}:{}"'.format(user, group),
         'needs': [
             'user:{}'.format(user),
             'download:/usr/local/bin/gitea',
@@ -66,6 +67,7 @@ actions = {
     },
     'chmod_gitea': {
         'command': 'chmod 0764 /usr/local/bin/gitea',
+        'unless': 'test "`stat -c %a /usr/local/bin/gitea`" -eq "764"',
         'needs': [
             'download:/usr/local/bin/gitea',
         ],
