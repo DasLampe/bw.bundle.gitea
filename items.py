@@ -1,3 +1,5 @@
+import crypt
+
 mysql_db = node.metadata.get('gitea', {}).get('db', {}).get('db', 'gitea')
 mysql_host = node.metadata.get('gitea', {}).get('db', {}).get('host', 'localhost')
 mysql_user = node.metadata.get('db', {}).get('user', 'gitea')
@@ -54,11 +56,17 @@ actions = {
         'triggered': True,
         'cascade_skip': False,
     },
+    'add_gitea_user': {
+        'command': 'useradd -d /var/lib/gitea -c "Gitea User" -s /bin/bash -p {password} {user}'.format(
+            user=user,
+            password=crypt.crypt(repo.vault.password_for('gitea_user_{}'.format(node.name)).value)),
+        'unless': 'cat /etc/passwd | grep {} &>/dev/null'.format(user),
+    },
     'chown_gitea': {
         'command': 'chown {}:{} /usr/local/bin/gitea'.format(user, group),
         'unless': 'test "`stat -c %U:%G /usr/local/bin/gitea`" = "{}:{}"'.format(user, group),
         'needs': [
-            'user:{}'.format(user),
+            'action:add_gitea_user',
             'download:/usr/local/bin/gitea',
         ],
         'needed_by': [
@@ -82,32 +90,47 @@ directories = {
         'owner': user,
         'group': group,
         'owner': user,
+        'needs': [
+            'action:add_gitea_user',
+        ]
     },
     '/var/lib/gitea/data': {
         'owner': user,
         'group': group,
         'mode': '0750',
+        'needs': [
+            'action:add_gitea_user',
+        ]
     },
     '/var/lib/gitea/indexers': {
         'owner': user,
         'group': group,
         'mode': '0750',
+        'needs': [
+            'action:add_gitea_user',
+        ]
     },
     '/var/lib/gitea/public': {
         'owner': user,
         'group': group,
+        'needs': [
+            'action:add_gitea_user',
+        ]
     },
     '/var/lib/gitea/log': {
         'owner': user,
         'group': group,
         'mode': '0750',
+        'needs': [
+            'action:add_gitea_user',
+        ]
     },
     '/etc/gitea': {
         'owner': 'root',
         'group': group,
         'mode': '0750',
         'needs': [
-            'user:{}'.format(user),
+            'action:add_gitea_user',
         ]
     }
 }
@@ -123,6 +146,9 @@ files = {
         'group': group,
         'mode': '0644',
         'unless': 'test -f /etc/gitea/app.ini', # Gitea write INTERNAL_TOKEN to ini file
+        'needs': [
+            'action:add_gitea_user',
+        ]
     },
     '/etc/systemd/system/gitea.service': {
         'source': 'etc/systemd/system/gitea.service',
